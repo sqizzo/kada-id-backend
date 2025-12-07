@@ -90,3 +90,6 @@ test-results/
 # OS generated files
 *.swp
 *.swo
+
+# Custom
+starter/

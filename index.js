@@ -2,9 +2,19 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
+import passport from "passport";
+import cookieParser from "cookie-parser";
+import logger from "./utils/logger.js";
+import requestLogger from "./utils/requestLogger.js";
+
+// Config
 import { connection } from "./config/database.js";
+import passportConfig from "./config/passport.js";
+
+// Utils
 import { errorHandler } from "./utils/errorHandler.js";
 
+// Routes
 import authRoutes from "./routes/auth.routes.js";
 
 dotenv.config();
@@ -17,21 +27,41 @@ const CLIENT_URL = process.env.CLIENT_BASE_URL || "http://localhost:5173";
 
 const corsOptions = {
   origin: CLIENT_URL,
+  credentials: true,
 };
 
+passportConfig();
+app.use(passport.initialize());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(helmet());
+app.use(cookieParser());
+// HTTP request logging
+app.use(requestLogger);
 
 app.use("/api/auth", authRoutes);
 
 app.use(errorHandler);
 
-connection().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on ${BASE_URL}:${PORT}`);
-    console.log(`Client running on ${CLIENT_URL}`);
+connection()
+  .then(() => {
+    app.listen(PORT, () => {
+      logger.info(`Server running on ${BASE_URL}:${PORT}`);
+      logger.info(`Client running on ${CLIENT_URL}`);
+    });
+  })
+  .catch((err) => {
+    logger.error("Failed to connect to database", err);
+    process.exit(1);
   });
+
+process.on("unhandledRejection", (reason) => {
+  logger.error("Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  logger.error("Uncaught Exception:", err);
+  process.exit(1);
 });
 
 app.get("/", (req, res) => {
