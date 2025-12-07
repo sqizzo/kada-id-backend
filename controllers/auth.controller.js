@@ -16,7 +16,6 @@ export const login = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    console.log(user);
     if (!user) return sendError(res, "User not found", null, 401);
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -25,15 +24,13 @@ export const login = async (req, res) => {
     const accessToken = signAccessToken(user);
     const refreshToken = signRefreshToken(user);
 
-    // Secure cookie options
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      path: "/auth/refresh",
+      path: "/",
     };
 
-    // Set refresh token cookie
     res.cookie("refreshToken", refreshToken, cookieOptions);
 
     const responseData = {
@@ -73,17 +70,22 @@ export const refreshToken = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      path: "/auth/refresh",
+      path: "/",
     };
 
     res.cookie("refreshToken", newRefreshToken, cookieOptions);
 
-    return sendSuccess(
-      res,
-      { accessToken: newAccessToken },
-      "Token refreshed",
-      200
-    );
+    const responseData = {
+      accessToken: newAccessToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    };
+
+    return sendSuccess(res, responseData, "Token refreshed", 200);
   } catch (error) {
     console.error("Refresh token error:", error);
     return sendError(res, "Invalid refresh token", null, 403);
@@ -107,5 +109,23 @@ export const me = async (req, res) => {
   } catch (err) {
     console.error("Auth me error:", err);
     return sendError(res, "Internal server error", null, 500);
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+    };
+
+    res.clearCookie("refreshToken", cookieOptions);
+
+    return sendSuccess(res, null, "Logged out", 200);
+  } catch (err) {
+    console.error("Logout error:", err);
+    return sendError(res, "Failed to logout", null, 500);
   }
 };

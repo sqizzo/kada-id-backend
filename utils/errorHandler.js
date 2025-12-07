@@ -1,6 +1,15 @@
+import logger from "./logger.js";
+import { sendError } from "./response.js";
+
 export const errorHandler = (err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    message: err.message || "Internal Server Error",
-  });
+  logger.error(err);
+
+  return sendError(
+    res,
+    err.message || "Internal Server Error",
+    null,
+    err.status || 500
+  );
 };
+
+export default errorHandler;
