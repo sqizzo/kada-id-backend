@@ -1,4 +1,3 @@
-
 # Kada-ID Backend
 
 > Minimal Node.js/Express backend for authentication (login/register)
@@ -6,6 +5,7 @@
 ---
 
 ## Table of contents
+
 - About
 - Requirements
 - Quick start
@@ -15,13 +15,16 @@
 - Notes
 
 ## About
+
 This repository contains a small Express-based backend for handling authentication (login/register). It includes database configuration in `config/database.js`, a `User` model in `models/`, controllers in `controllers/`, and auth routes in `routes/auth.routes.js`.
 
 ## Requirements
+
 - Node.js 16+ (or your project's target Node version)
 - A running database (as configured in `config/database.js`) — e.g., PostgreSQL, MySQL, or SQLite depending on your setup
 
 ## Quick start
+
 1. Install dependencies:
 
 ```powershell
@@ -39,6 +42,7 @@ npm run dev
 The app defaults to `http://localhost:3000` unless changed in your start script or environment.
 
 ## Environment
+
 Create a `.env` file in the project root or configure environment variables for your shell. Common variables used by this project:
 
 - `PORT` — Port for the server (default 3000)
@@ -58,31 +62,16 @@ NODE_ENV=development
 Note: This repo may also include other DB config fields in `config/database.js`; adapt your `.env` accordingly.
 
 ## Scripts
+
 - `npm run dev` — runs the server in development mode (use this while developing)
 - `npm start` — production start (if defined in `package.json`)
 
 Add test or lint scripts as needed.
 
 ## Useful endpoints
+
 These examples assume the server is running at `http://localhost:3000` and that `routes/auth.routes.js` mounts routes under `/auth`.
 
 - POST `/auth/login` — body: `{ "email": "user@example.com", "password": "Password123" }` — returns JWT or error on failure.
-- POST `/auth/register` — body: `{ "email": "user@example.com", "password": "Password123" }` — create new user (if route implemented).
 
 Use the REST Client file at `test/auth.http` to exercise these endpoints quickly from VS Code, or use `curl`/Postman.
-
-Example `curl` (PowerShell-compatible):
-
-```powershell
-curl -X POST http://localhost:3000/auth/login -H 'Content-Type: application/json' -d '{"email":"existing@example.com","password":"Password123!"}'
-```
-
-## Notes & next steps
-- If you need automated tests, consider adding `jest` + `supertest` and creating integration tests for the auth routes.
-- Add a sample `.env.example` (without secrets) to the repo to document required environment variables.
-- Consider CI integration to run lint/tests on PRs.
-
-If you'd like, I can:
-- add a `scripts` entry to create a test user via a simple script,
-- scaffold `jest` + `supertest` integration tests for `/auth/login`, or
-- commit the README and `.gitignore` changes for you.
