@@ -1,6 +1,6 @@
 # Kada-ID Backend
 
-> Minimal Node.js/Express backend for authentication (login/register)
+Minimal Node.js/Express backend for KADA CMS.
 
 ---
 
@@ -11,17 +11,26 @@
 - Quick start
 - Environment
 - Scripts
-- Useful endpoints
+- Endpoints
+- Testing
 - Notes
 
 ## About
 
-This repository contains a small Express-based backend for handling authentication (login/register). It includes database configuration in `config/database.js`, a `User` model in `models/`, controllers in `controllers/`, and auth routes in `routes/auth.routes.js`.
+This repository contains a small Express-based backend focused on authentication. Key files:
+
+- `index.js` — server bootstrap and middleware
+- `config/database.js` — MongoDB connection
+- `config/passport.js` — Passport JWT strategy
+- `models/User.js` — Mongoose user model (password hashing hook)
+- `controllers/auth.controller.js` — login, refresh, profile (`/me`)
+- `routes/auth.routes.js` — mounted at `/api/auth`
+- `utils/response.js` — standardized JSON response helpers
 
 ## Requirements
 
-- Node.js 16+ (or your project's target Node version)
-- A running database (as configured in `config/database.js`) — e.g., PostgreSQL, MySQL, or SQLite depending on your setup
+- Node.js 16+
+- MongoDB (set `MONGODB_URI`)
 
 ## Quick start
 
@@ -31,47 +40,41 @@ This repository contains a small Express-based backend for handling authenticati
 npm install
 ```
 
-2. Create environment variables (see Environment below) and ensure your database is reachable.
+2. Create a `.env` in the project root. See Environment below.
 
-3. Start the development server:
+3. Start the dev server:
 
 ```powershell
 npm run dev
 ```
 
-The app defaults to `http://localhost:3000` unless changed in your start script or environment.
+The server listens on `PORT` (default 3000) and mounts auth routes under `/api/auth`.
 
 ## Environment
 
-Create a `.env` file in the project root or configure environment variables for your shell. Common variables used by this project:
+Create a `.env` file with at least the following variables:
 
-- `PORT` — Port for the server (default 3000)
-- `DATABASE_URL` or DB-specific variables — connection string used by `config/database.js`
-- `JWT_SECRET` — secret used to sign authentication tokens
-- `NODE_ENV` — `development` / `production`
-
-Example `.env`:
-
-```
-PORT=3000
-DATABASE_URL=postgres://user:password@localhost:5432/mydb
-JWT_SECRET=your_jwt_secret_here
-NODE_ENV=development
-```
-
-Note: This repo may also include other DB config fields in `config/database.js`; adapt your `.env` accordingly.
+- PORT=3000
+- BASE_URL=http://localhost
+- CLIENT_BASE_URL=
+- MONGODB_URI=
+- JWT_SECRET=
+- JWT_REFRESH_SECRET=
 
 ## Scripts
 
-- `npm run dev` — runs the server in development mode (use this while developing)
-- `npm start` — production start (if defined in `package.json`)
+- `npm run dev` — start dev server (nodemon)
+- `npm start` — run in production
 
-Add test or lint scripts as needed.
+## Endpoints
 
-## Useful endpoints
+All auth endpoints are mounted under `/api/auth`.
 
-These examples assume the server is running at `http://localhost:3000` and that `routes/auth.routes.js` mounts routes under `/auth`.
+- POST `/api/auth/login` — body: `{ "email": "...", "password": "..." }` — returns `{ status:'success', data: { accessToken, user } }` on success and sets a `refreshToken` httpOnly cookie.
+- POST `/api/auth/refresh` — exchanges the `refreshToken` cookie for a new access token: returns `{ status:'success', data: { accessToken } }`.
+- GET `/api/auth/me` — protected endpoint (Bearer JWT) returning the authenticated user profile.
 
-- POST `/auth/login` — body: `{ "email": "user@example.com", "password": "Password123" }` — returns JWT or error on failure.
+Responses use a standardized shape from `utils/response.js`:
 
-Use the REST Client file at `test/auth.http` to exercise these endpoints quickly from VS Code, or use `curl`/Postman.
+- Success: `{ status: 'success', success: true, message, data }`
+- Error: `{ status: 'error', success: false, message, errors? }`
