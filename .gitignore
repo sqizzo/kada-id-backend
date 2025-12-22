@@ -55,6 +55,7 @@ jspm_packages/
 .env
 .env.*.local
 .env.local
+.postman_environment.json
 
 # macOS
 .DS_Store
