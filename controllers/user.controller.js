@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import User from "../models/User.js";
 import { sendError, sendSuccess } from "../utils/response.js";
 import bcrypt from "bcrypt";
@@ -67,6 +68,41 @@ export const addAccount = async (req, res) => {
     }
   } catch (error) {
     console.error("Error adding account:", error);
+    return sendError(res, "Internal server error", null);
+  }
+};
+
+export const deleteAccountById = async (req, res) => {
+  try {
+    const { id } = req.params || {};
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return sendError(res, "Invalid user id", null, 400);
+    }
+
+    if (req.user && req.user._id?.toString() === id) {
+      return sendError(res, "You cannot delete your own account", null, 400);
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return sendError(res, "User not found", null, 404);
+    }
+
+    if (user.role == "admin") {
+      return sendError(res, "You cannot delete another admin", null, 400);
+    }
+
+    await user.deleteOne();
+
+    return sendSuccess(
+      res,
+      { id: user._id, email: user.email },
+      "Account deleted successfully",
+      200
+    );
+  } catch (error) {
+    console.error("Error deleting account:", error);
     return sendError(res, "Internal server error", null);
   }
 };
