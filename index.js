@@ -17,6 +17,7 @@ import { errorHandler } from "./utils/errorHandler.js";
 // Routes
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import logRoutes from "./routes/log.routes.js";
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use(requestLogger);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/logs", logRoutes);
 
 app.use(errorHandler);
 

@@ -4,7 +4,9 @@ import passport from "passport";
 import {
   addAccount,
   deleteAccountById,
+  getAccountById,
   getAllAccount,
+  updateAccountById,
 } from "../controllers/user.controller.js";
 import { isAdmin } from "../middlewares/rbac.js";
 
@@ -22,6 +24,20 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   isAdmin,
   getAllAccount
+);
+
+router.get(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  isAdmin,
+  getAccountById
+);
+
+router.patch(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  isAdmin,
+  updateAccountById
 );
 
 router.delete(
