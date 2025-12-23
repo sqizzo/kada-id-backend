@@ -2,7 +2,7 @@
   "info": {
     "name": "Kada ID API",
     "_postman_id": "1d6d3b32-2f78-4c24-9ab5-0c6cd1fc5d11",
-    "description": "Collection to exercise Kada ID authentication and user-management routes with admin-only RBAC checks.",
+    "description": "Collection to exercise Kada ID authentication, user-management, and log routes with admin-only RBAC checks.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -234,9 +234,9 @@
               "raw": "{\n  \"name\": \"{{newUserName}}\",\n  \"email\": \"{{newUserEmail}}\",\n  \"password\": \"{{newUserPassword}}\",\n  \"role\": \"{{newUserRole}}\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/users/add",
+              "raw": "{{baseUrl}}/api/users",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "users", "add"]
+              "path": ["api", "users"]
             }
           },
           "response": [],
@@ -266,9 +266,9 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/users/",
+              "raw": "{{baseUrl}}/api/users",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "users", ""]
+              "path": ["api", "users"]
             }
           },
           "response": [],
@@ -279,6 +279,196 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Accounts fetched\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Account By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{targetUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{targetUserId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Account fetched\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Account (Admin Only)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"role\": \"moderator\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{targetUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{targetUserId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Account updated\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Account (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{targetUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "{{targetUserId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Account deleted\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "description": "Admin protected activity log endpoints.",
+      "item": [
+        {
+          "name": "Get All Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Logs fetched\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recent Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/logs/recent?limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logs", "recent"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Recent logs fetched\", function () {",
                   "  pm.response.to.have.status(200);",
                   "});"
                 ]
@@ -333,6 +523,10 @@
     {
       "key": "newUserRole",
       "value": "moderator"
+    },
+    {
+      "key": "targetUserId",
+      "value": ""
     }
   ]
 }
