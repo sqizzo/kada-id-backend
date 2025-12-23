@@ -2,49 +2,58 @@ import { Router } from "express";
 import passport from "passport";
 
 import {
-  addAccount,
-  deleteAccountById,
-  getAccountById,
-  getAllAccount,
-  updateAccountById,
-} from "../controllers/user.controller.js";
+  getAllProgramSettings,
+  getProgramSettingById,
+  addProgramSetting,
+  updateProgramSetting,
+  deleteProgramSetting,
+  setProgramSettingActive,
+} from "../controllers/program.controller.js";
+
 import { isAdmin } from "../middlewares/rbac.js";
 
 const router = Router();
-
-router.post(
-  "/",
-  passport.authenticate("jwt", { session: false }),
-  isAdmin,
-  addAccount
-);
 
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
   isAdmin,
-  getAllAccount
+  getAllProgramSettings
 );
 
 router.get(
   "/:id",
   passport.authenticate("jwt", { session: false }),
   isAdmin,
-  getAccountById
+  getProgramSettingById
+);
+
+router.post(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  isAdmin,
+  addProgramSetting
+);
+
+router.put(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  isAdmin,
+  updateProgramSetting
 );
 
 router.patch(
   "/:id",
   passport.authenticate("jwt", { session: false }),
   isAdmin,
-  updateAccountById
+  setProgramSettingActive
 );
 
 router.delete(
   "/:id",
   passport.authenticate("jwt", { session: false }),
   isAdmin,
-  deleteAccountById
+  deleteProgramSetting
 );
 
 export default router;
