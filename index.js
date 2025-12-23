@@ -18,6 +18,8 @@ import { errorHandler } from "./utils/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import logRoutes from "./routes/log.routes.js";
+import programRoutes from "./routes/program.routes.js";
+import publicRoutes from "./routes/public.routes.js";
 
 dotenv.config();
 
@@ -41,9 +43,11 @@ app.use(cookieParser());
 // HTTP request logging
 app.use(requestLogger);
 
+app.use("/api/public", publicRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/logs", logRoutes);
+app.use("/api/program", programRoutes);
 
 app.use(errorHandler);
 
